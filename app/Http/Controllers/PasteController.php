@@ -26,8 +26,14 @@ class PasteController extends Controller
             abort(403, 'Incorrect or missing API key');
         }
 
-        $file = $request->file('file');
-        $content = trim(file_get_contents($file));
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $content = trim(file_get_contents($file));
+        } else {
+            $content = trim($request->get('content'));
+        }
+
+        //$content = trim(file_get_contents($file));
 
         $hlen = $request->get('hlen') ?? 6;
         $hash = $request->get('hash') ?? $this->getNewHash($hlen);
@@ -151,6 +157,39 @@ class PasteController extends Controller
         return response(view('paste', ['content' => $paste->content, 'syntax' => $syntax]))
             ->header('Cache-Control', 'public, max-age=' . config('xpb.cache.max-age'))
             ->header('X-Robots-Tag', 'noindex');
+    }
+
+
+    public function create(Request $request)
+    {
+        if (is_null(env('FORM_API'))) {
+            abort(403, 'Public form disabled');
+        }
+
+        return response(view('create'));
+    }
+
+
+    public function pub_store(Request $request)
+    {
+        // Make sure pasts are not too big
+        if (strlen($request->get('content')) > 1024*8) {
+            abort(400, 'Invalid paste length');
+        }
+
+        //dd($request->file);
+
+        $request->merge([
+            'prefix' => 'public',
+            'ttl' => 3600*24*30,
+            'hlen' => 12
+        ]);
+        $request->headers->set('X-API-Key', env('FORM_API'));
+
+        $response = $this->store($request);
+        $json = json_decode($response->getContent());
+
+        return redirect($json->url);
     }
 
 }

@@ -14,8 +14,12 @@
 $router->get('/', [ 'uses' => 'PasteController@index' ]);
 $router->get('/stats', [ 'uses' => 'StatsController@show' ]);
 
+# Create form
+$router->get('/paste', [ 'uses' => 'PasteController@create' ]);
+
 # Show
 $router->get('/{hash:.*}', [ 'uses' => 'PasteController@show' ]);
 
 # Upload
 $router->post('/paste', [ 'uses' => 'PasteController@store' ]);
+$router->post('/paste/public', [ 'uses' => 'PasteController@pub_store' ]);

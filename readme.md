@@ -36,12 +36,15 @@ Headers:
 * `X-API-Key`: API key
 
 Parameters:
-* `file`: paste content (required)
+* `file`: content file
+* `content`: paste content
 * `hash`: set custom hash key, allowed characters: [A-Za-z0-9_/-]
 * `prefix`: adds `prefix/` in front of the hash key
 * `mime`: specify content mime, like `image/jpeg`
 * `ttl`: set time to live, in seconds
 * `hlen`: hash key length, default: 6
+
+Either `file` or `content` must be present.
 
 ### Alias
 Put this in your `.bashrc` or `.zshrc`:
