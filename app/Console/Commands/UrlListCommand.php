@@ -13,7 +13,8 @@ class UrlListCommand extends Command
      *
      * @var string
      */
-    protected $signature = "url:list";
+    protected $signature = "url:list
+                            {hash?* : Hash keys to list}";
 
     /**
      * The console command description.
@@ -30,12 +31,20 @@ class UrlListCommand extends Command
      */
     public function handle()
     {
-        $hgetall = Redis::hgetall('sys:shorturl');
+        if(count($this->argument('hash')) > 0) {
+            $hgetall = array_flip($this->argument('hash'));
+        } else {
+            $hgetall = Redis::hgetall('sys:shorturl');
+        }
         $shortUrls = [];
 
         foreach ($hgetall as $hash => $url)
         {
             $shortUrl = ShortUrl::Find($hash);
+
+            if (is_null($shortUrl)) {
+                continue;
+            }
 
             $shortUrls[] = [
                 'hash' => $shortUrl->hash,

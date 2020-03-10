@@ -12,7 +12,8 @@ class PasteListCommand extends Command
      *
      * @var string
      */
-    protected $signature = "paste:list";
+    protected $signature = "paste:list
+                            {hash?* : Hash keys to list}";
 
     /**
      * The console command description.
@@ -29,7 +30,12 @@ class PasteListCommand extends Command
      */
     public function handle()
     {
-        $files = scandir(storage_path('app'));
+        if(count($this->argument('hash')) > 0) {
+            $files = $this->argument('hash');
+        } else {
+            $files = scandir(storage_path('app'));
+        }
+
         $pastes = [];
 
         foreach ($files as $hash)
